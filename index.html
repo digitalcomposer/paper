@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="en" id="htmlRoot">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SOFEL MR — AI Logo Placement Studio (Concept Demo)</title>
+<style>
+:root{
+  --bg:#f4efe3; --bg2:#ece3cf; --panel:#fffdf9; --panel-soft:#faf5eb;
+  --border:#ddd0b3; --border-soft:#e9dfc7;
+  --accent:#a9713f; --accent-dark:#875a30; --accent2:#3f7a52; --gold:#c08f3e; --danger:#b8503f;
+  --text:#2c2620; --text-dim:#726a5c; --text-dim2:#9b917d;
+  --radius:14px;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+body{
+  background:
+    radial-gradient(900px 500px at 15% -10%, #fbf3e2 0%, transparent 60%),
+    radial-gradient(800px 500px at 100% 0%, #eef2e6 0%, transparent 55%),
+    var(--bg);
+  color:var(--text); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Arial,sans-serif;
+  min-height:100vh; padding:22px;
+}
+.app{max-width:1480px; margin:0 auto;}
+
+header{display:flex; align-items:flex-start; justify-content:space-between; gap:16px; margin-bottom:14px; flex-wrap:wrap;}
+.brand{display:flex; align-items:center; gap:13px;}
+.brand .mark{width:52px; height:52px; border-radius:12px; background:linear-gradient(150deg,var(--accent),var(--accent-dark)); display:flex; align-items:center; justify-content:center; font-weight:800; color:#fdf6ea; font-size:15px; flex-shrink:0; letter-spacing:.02em; box-shadow:0 4px 14px rgba(135,90,48,.28);}
+.brand h1{font-size:20px; font-weight:800; letter-spacing:-.01em;}
+.brand .app-name{font-size:12.5px; color:var(--accent-dark); font-weight:700;}
+.brand .sub{font-size:12.5px; color:var(--text-dim); margin-top:2px; max-width:460px;}
+.head-right{display:flex; align-items:center; gap:12px; flex-wrap:wrap;}
+.demo-badge{font-size:10.5px; font-weight:700; letter-spacing:.03em; padding:7px 13px; border-radius:999px; background:rgba(184,80,63,.1); color:var(--danger); border:1px solid rgba(184,80,63,.28); max-width:300px; line-height:1.4;}
+.lang-toggle{display:flex; border:1px solid var(--border); border-radius:999px; overflow:hidden; background:var(--panel);}
+.lang-btn{padding:7px 15px; font-size:12px; font-weight:800; cursor:pointer; color:var(--text-dim); background:transparent; border:none;}
+.lang-btn.active{background:var(--accent); color:#fff;}
+
+.badge-row{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:20px;}
+.trust-pill{font-size:11px; font-weight:700; padding:6px 12px; border-radius:999px; background:var(--panel); border:1px solid var(--border); color:var(--accent-dark);}
+
+.grid{display:grid; grid-template-columns:310px 1fr 400px; gap:18px; align-items:start;}
+.panel{background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); padding:18px; box-shadow:0 1px 3px rgba(60,45,20,.04);}
+.panel h3{font-size:12px; text-transform:uppercase; letter-spacing:.06em; color:var(--accent2); margin-bottom:14px; display:flex; align-items:center; gap:8px; font-weight:800;}
+.panel h3 .step-n{width:19px; height:19px; border-radius:5px; background:var(--accent2); color:#fff; font-size:11px; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+
+.left-stack > .panel{margin-bottom:16px;}
+.field-label{font-size:11px; font-weight:700; color:var(--text-dim); text-transform:uppercase; letter-spacing:.04em; margin:14px 0 8px;}
+.field-label:first-child{margin-top:0;}
+.opt-row{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
+.opt-chip{border:1px solid var(--border); border-radius:10px; padding:9px 8px; text-align:center; cursor:pointer; font-size:12px; transition:.2s; background:var(--panel-soft); font-weight:600;}
+.opt-chip .sw{width:22px; height:22px; border-radius:6px; margin:0 auto 6px; border:1px solid rgba(0,0,0,.12);}
+.opt-chip.active{border-color:var(--accent2); background:rgba(63,122,82,.1); color:var(--accent-dark); box-shadow:inset 0 0 0 1px var(--accent2);}
+.size-row{display:flex; flex-direction:column; gap:7px;}
+.size-btn{padding:9px 10px; border-radius:9px; border:1px solid var(--border); background:var(--panel-soft); font-size:12px; cursor:pointer; transition:.2s; display:flex; justify-content:space-between; align-items:center;}
+.size-btn b{font-weight:700;}
+.size-btn span{color:var(--text-dim2); font-size:11px;}
+.size-btn.active{border-color:var(--accent); background:rgba(169,113,63,.1); box-shadow:inset 0 0 0 1px var(--accent);}
+.qty-row{display:flex; gap:8px; align-items:center;}
+.qty-row input{flex:1; padding:9px 11px; border:1px solid var(--border); border-radius:8px; font-size:13px; background:var(--panel-soft); color:var(--text);}
+.method-badge{margin-top:10px; font-size:11.5px; padding:8px 11px; border-radius:8px; background:rgba(192,143,62,.12); border:1px solid rgba(192,143,62,.3); color:var(--accent-dark); font-weight:700;}
+.moq-note{font-size:11px; color:var(--text-dim); margin-top:7px; line-height:1.5;}
+
+.dropzone{border:1.5px dashed var(--border); border-radius:10px; padding:20px 12px; text-align:center; cursor:pointer; transition:.2s; background:var(--panel-soft);}
+.dropzone:hover, .dropzone.drag{border-color:var(--accent2); background:rgba(63,122,82,.06);}
+.dropzone .ic{font-size:24px; margin-bottom:8px;}
+.dropzone .t{font-size:12.5px; color:var(--text);}
+.dropzone .h{font-size:10.5px; color:var(--text-dim2); margin-top:4px;}
+.file-pill{display:flex; align-items:center; gap:8px; margin-top:10px; font-size:11.5px; padding:8px 10px; border-radius:8px; background:rgba(169,113,63,.1); border:1px solid rgba(169,113,63,.28); color:var(--accent-dark);}
+
+.spec-list{font-size:12.5px;}
+.spec-row{display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid var(--border-soft); gap:10px;}
+.spec-row:last-child{border-bottom:none;}
+.spec-row .k{color:var(--text-dim);}
+.spec-row .v{font-weight:700; text-align:right;}
+
+.chat-panel{display:flex; flex-direction:column; height:660px;}
+.chat-log{flex:1; overflow-y:auto; padding-right:4px; margin-bottom:12px;}
+.msg{display:flex; gap:10px; margin-bottom:14px; align-items:flex-start;}
+.msg.user{flex-direction:row-reverse;}
+.msg .av{width:28px; height:28px; border-radius:8px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:10.5px; font-weight:800;}
+.msg.bot .av{background:linear-gradient(150deg,var(--accent),var(--accent-dark)); color:#fdf6ea;}
+.msg.user .av{background:var(--bg2); color:var(--text);}
+.msg .bubble{max-width:78%; padding:10px 13px; border-radius:12px; font-size:13.5px; line-height:1.5;}
+.msg.bot .bubble{background:var(--panel-soft); border:1px solid var(--border); border-top-left-radius:2px;}
+.msg.user .bubble{background:rgba(63,122,82,.12); border:1px solid rgba(63,122,82,.25); border-top-right-radius:2px;}
+.chips-row{display:flex; flex-wrap:wrap; gap:7px; margin-bottom:12px;}
+.sugg-chip{font-size:11.5px; padding:7px 12px; border-radius:999px; border:1px solid var(--border); background:var(--panel-soft); cursor:pointer; color:var(--text-dim); transition:.2s;}
+.sugg-chip:hover{border-color:var(--accent2); color:var(--accent-dark);}
+.chat-input-row{display:flex; gap:8px;}
+.chat-input-row input{flex:1; background:var(--panel-soft); border:1px solid var(--border); border-radius:9px; padding:11px 13px; color:var(--text); font-size:13.5px; outline:none;}
+.chat-input-row input:focus{border-color:var(--accent);}
+.chat-input-row button{padding:0 18px; border-radius:9px; border:none; background:var(--accent); color:#fff; font-weight:800; cursor:pointer; font-size:13px;}
+
+.canvas-wrap{position:relative; border-radius:12px; overflow:hidden; background:linear-gradient(180deg,#f6f1e6,#eee5d1); margin-bottom:14px;}
+#bagCanvas{width:100%; display:block; cursor:grab;}
+#bagCanvas:active{cursor:grabbing;}
+.drag-hint{position:absolute; bottom:8px; left:0; right:0; text-align:center; font-size:10.5px; color:var(--text-dim2); pointer-events:none;}
+
+.stepper{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:14px;}
+.stp{flex:1; min-width:68px; text-align:center; padding:7px 4px; border-radius:8px; border:1px solid var(--border); font-size:9.5px; color:var(--text-dim2); background:var(--panel-soft); transition:.3s;}
+.stp .num{display:block; font-size:11px; font-weight:800; margin-bottom:2px;}
+.stp.active{border-color:var(--accent); background:rgba(169,113,63,.12); color:var(--accent-dark);}
+.stp.done{border-color:var(--accent2); background:rgba(63,122,82,.12); color:var(--accent2);}
+
+.btn{width:100%; padding:13px; border-radius:9px; font-weight:800; font-size:13.5px; cursor:pointer; border:none; margin-bottom:9px; transition:.2s;}
+.btn-primary{background:linear-gradient(120deg,var(--accent),var(--accent-dark)); color:#fff;}
+.btn-primary:disabled{opacity:.4; cursor:not-allowed;}
+.btn-success{background:linear-gradient(120deg,var(--accent2),#2e5f40); color:#fff;}
+.btn-success:disabled{opacity:.35; cursor:not-allowed;}
+
+.contact-grid{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px;}
+.contact-grid input, .contact-grid textarea{padding:9px 10px; border:1px solid var(--border); border-radius:8px; font-size:12.5px; background:var(--panel-soft); color:var(--text); font-family:inherit;}
+.contact-grid .full{grid-column:1/-1;}
+
+.note{font-size:10.5px; color:var(--text-dim2); text-align:center; margin-top:6px; line-height:1.5;}
+
+.success-banner{display:none; margin-top:12px; padding:14px; border-radius:10px; background:rgba(63,122,82,.09); border:1px solid rgba(63,122,82,.3); text-align:left;}
+.success-banner.show{display:block;}
+.success-banner .big{font-size:22px; margin-bottom:4px;}
+.success-banner h4{font-size:13.5px; margin-bottom:6px;}
+.success-banner p{font-size:11.5px; color:var(--text-dim); line-height:1.5;}
+
+footer{margin-top:30px; border-top:1px solid var(--border); padding-top:22px;}
+.process-strip{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:22px;}
+.proc-step{flex:1; min-width:150px; background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:12px 14px; font-size:12px;}
+.proc-step .n{font-size:10px; font-weight:800; color:var(--accent2); text-transform:uppercase; letter-spacing:.05em;}
+.proc-step div.t{font-weight:700; margin-top:3px;}
+.footer-grid{display:grid; grid-template-columns:1.3fr 1fr; gap:24px; font-size:12.5px; color:var(--text-dim);}
+.footer-grid h5{font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--accent-dark); margin-bottom:8px;}
+.footer-grid p{margin-bottom:5px; line-height:1.6;}
+.footer-disclaimer{margin-top:20px; padding-top:16px; border-top:1px solid var(--border-soft); font-size:11px; color:var(--text-dim2); line-height:1.6;}
+
+@media(max-width:1180px){
+  .grid{grid-template-columns:1fr;}
+  .chat-panel{height:480px;}
+  .footer-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="brand">
+      <div class="mark">SM</div>
+      <div>
+        <h1 id="txtBrandName">SOFEL MR</h1>
+        <div class="app-name" id="txtAppName">AI Logo Placement Studio</div>
+        <div class="sub" id="txtSubtitle">Configure your paper bags, upload your logo, and request a quote — based on SOFEL MR's real production specs.</div>
+      </div>
+    </div>
+    <div class="head-right">
+      <div class="demo-badge" id="txtBadge">● Concept demo — not an official SOFEL MR tool. Runs entirely in your browser.</div>
+      <div class="lang-toggle">
+        <button class="lang-btn active" id="langEnBtn">EN</button>
+        <button class="lang-btn" id="langBgBtn">BG</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="badge-row" id="trustRow"></div>
+
+  <div class="grid">
+    <div class="left-stack">
+      <div class="panel">
+        <h3><span class="step-n">1</span><span id="txtStep1">Configure your bags</span></h3>
+
+        <div class="field-label" id="txtHandleLabel">Handle type</div>
+        <div class="opt-row" id="handleOpts"></div>
+
+        <div class="field-label" id="txtPaperLabel">Paper</div>
+        <div class="opt-row" id="paperOpts"></div>
+
+        <div class="field-label" id="txtSizeLabel">Size</div>
+        <div class="size-row" id="sizeOpts"></div>
+
+        <div class="field-label" id="txtQtyLabel">Quantity (pcs)</div>
+        <div class="qty-row"><input type="number" id="qtyInput" min="100" step="100" value="5000"></div>
+        <div class="method-badge" id="methodBadge"></div>
+        <div class="moq-note" id="moqNote"></div>
+      </div>
+      <div class="panel">
+        <h3><span class="step-n">2</span><span id="txtStep2">Upload your logo</span></h3>
+        <div class="dropzone" id="dropzone">
+          <div class="ic">⬆</div>
+          <div class="t" id="txtDropTitle">Drop an image here or click to browse</div>
+          <div class="h" id="txtDropHint">JPG · PNG · WEBP · GIF · SVG · HEIC · PDF</div>
+          <input type="file" id="fileInput" accept="image/*,.heic,.heif,.pdf" style="display:none">
+        </div>
+        <div id="filePill"></div>
+      </div>
+    </div>
+
+    <div class="panel chat-panel">
+      <h3 id="txtChatHeader">💬 Design assistant</h3>
+      <div class="chat-log" id="chatLog"></div>
+      <div class="chips-row" id="chipsRow"></div>
+      <div class="chat-input-row">
+        <input id="chatInput" type="text">
+        <button id="sendBtn">Send</button>
+      </div>
+    </div>
+
+    <div class="left-stack">
+      <div class="panel">
+        <h3 id="txtPreviewHeader">🖼 Live mockup</h3>
+        <div class="canvas-wrap">
+          <canvas id="bagCanvas" width="560" height="560"></canvas>
+          <div class="drag-hint" id="txtDragHint">drag the logo to reposition</div>
+        </div>
+        <div class="stepper" id="stepper"></div>
+        <button class="btn btn-primary" id="generateBtn">Generate print-ready file</button>
+      </div>
+      <div class="panel">
+        <h3><span class="step-n">3</span><span id="txtStep3">Request your quote</span></h3>
+        <div class="spec-list" id="specList"></div>
+        <div class="field-label" id="txtContactLabel" style="margin-top:14px;">Your details</div>
+        <div class="contact-grid">
+          <input type="text" id="cName" placeholder="Name">
+          <input type="text" id="cLast" placeholder="Last name">
+          <input type="tel" id="cPhone" placeholder="Phone *">
+          <input type="email" id="cEmail" placeholder="E-mail *">
+          <textarea class="full" id="cMsg" rows="2" placeholder="Message (optional)"></textarea>
+        </div>
+        <button class="btn btn-success" id="submitBtn" disabled>Request quote</button>
+        <div class="note" id="txtNote">Demo only — no data leaves your browser and no request is actually sent. In the live system this would go to order@sofel-mr.eu.</div>
+        <div class="success-banner" id="successBanner">
+          <div class="big">✅</div>
+          <h4 id="txtSuccessTitle">Quote request ready</h4>
+          <p id="successDetail"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="process-strip" id="processStrip"></div>
+    <div class="footer-grid">
+      <div>
+        <h5 id="txtFooterCoTitle">SOFEL MR Ltd.</h5>
+        <p id="footerAddress">Production base: Asenovgrad, NORTH Industrial Zone, 10 "Stroitel" Str., Bulgaria</p>
+        <p>Tel: +359 896 220 551</p>
+        <p id="footerEmails">Inquiries: office@sofel-mr.eu · Orders: order@sofel-mr.eu</p>
+        <p id="footerHours">Mon–Fri 8:00–17:00</p>
+      </div>
+      <div>
+        <h5 id="txtFooterAboutTitle">About the company</h5>
+        <p id="footerAbout">Manufacturer of paper bags and packaging since 2006, based in Asenovgrad, Bulgaria. 1.7 million pcs daily capacity, 8 production lines, 36-person team, exporting to 8 European countries. ISO 9001:2015 and FSC certified.</p>
+      </div>
+    </div>
+    <div class="footer-disclaimer" id="footerDisclaimer">
+      This is an independent concept demo built to illustrate a possible AI self-service tool, using SOFEL MR's publicly published production specifications and ordering process. It is not an official SOFEL MR product.
+    </div>
+  </footer>
+</div>
+
+<script>
+/* ============== I18N ============== */
+const I18N = {
+  en:{
+    brandName:"SOFEL MR", appName:"AI Logo Placement Studio",
+    subtitle:"Configure your paper bags, upload your logo, and request a quote — based on SOFEL MR's real production specs.",
+    badge:"● Concept demo — not an official SOFEL MR tool. Runs entirely in your browser.",
+    trustPills:["ISO 9001:2015","FSC Certified","Established 2006","1.7M bags / day","Exports to 8 EU countries"],
+    step1:"Configure your bags", step2:"Upload your logo", step3:"Request your quote",
+    handleLabel:"Handle type", paperLabel:"Paper", sizeLabel:"Size", qtyLabel:"Quantity (pcs)",
+    handles:{internal:"Internal handles", external:"External handles"},
+    papers:{white:"White kraft", kraft:"Brown kraft"},
+    sizeNames:{small:"Small", medium:"Medium", large:"Large"},
+    printMethods:{digital:"Digital printing (small series)", flexo:"Flexo printing — up to 6 colors"},
+    moqBelow:"Below 30,000 pcs per design, bags are typically produced via digital printing for small series.",
+    moqAbove:"This quantity qualifies for high-speed flexo printing — up to 6 colors.",
+    dropTitle:"Drop an image here or click to browse", dropHint:"JPG · PNG · WEBP · GIF · SVG · HEIC · PDF",
+    chatHeader:"💬 Design assistant", chatPlaceholder:"e.g. make it bigger and center it, or remove the background...",
+    sendBtn:"Send", previewHeader:"🖼 Live mockup", dragHint:"drag the logo to reposition",
+    generateBtn:"Generate print-ready file", submitBtn:"Request quote",
+    contactLabel:"Your details",
+    note:"Demo only — no data leaves your browser and no request is actually sent. In the live system this would go to order@sofel-mr.eu.",
+    successTitle:"Quote request ready",
+    specLabels:{handle:"Handle type", paper:"Paper", size:"Size", qty:"Quantity", method:"Printing method", logoFile:"Logo file", placement:"Placement", scale:"Scale", colorMode:"Color mode", background:"Background", status:"Status"},
+    colorModeLabels:{full:"Full color", grayscale:"Grayscale", mono:"Single color"},
+    bgLabels:{removed:"Removed", asUploaded:"As uploaded", dash:"—"},
+    statusLabels:{ready:"Print-ready ✓", draft:"Draft"},
+    stages:["Upload","LLM Intake","Normalize","Vectorize","Print Prep","Mockup","Human QA","Handoff"],
+    suggestions:["Make it bigger","Make it smaller","Center it","Remove the background","Single color","Make it gold","Looks good, generate it"],
+    pos:{left:"left", right:"right", top:"top", bottom:"bottom", centered:"Centered"},
+    colorNames:{black:"black", white:"white", gold:"gold", red:"red", blue:"blue", green:"green", navy:"navy"},
+    processSteps:[["Inquiry","The customer sends an inquiry by email or phone."],["Offer preparation","We clarify details and prepare an offer quickly."],["Order","After acceptance, a proforma invoice is issued with a 50% advance."],["Production & delivery","Bags are produced and delivered within the agreed time."]],
+    footerCoTitle:"SOFEL MR Ltd.", footerAboutTitle:"About the company",
+    footerAbout:"Manufacturer of paper bags and packaging since 2006, based in Asenovgrad, Bulgaria. 1.7 million pcs daily capacity, 8 production lines, 36-person team, exporting to 8 European countries. ISO 9001:2015 and FSC certified.",
+    footerAddress:'Production base: Asenovgrad, NORTH Industrial Zone, 10 "Stroitel" Str., Bulgaria',
+    footerEmails:"Inquiries: office@sofel-mr.eu · Orders: order@sofel-mr.eu",
+    footerHours:"Mon–Fri 8:00–17:00",
+    footerDisclaimer:"This is an independent concept demo built to illustrate a possible AI self-service tool, using SOFEL MR's publicly published production specifications and ordering process. It is not an official SOFEL MR product.",
+    msgs:{
+      handleSet:n=>`Set handle type to ${n}.`,
+      paperSet:n=>`Set paper to ${n}.`,
+      sizeSet:l=>`Set bag size to ${l}.`,
+      qtySet:(q,method)=>`Quantity set to ${q} pcs — that's ${method}.`,
+      gotLogo:n=>`Got it — I can see "${n}". Want it centered, bigger, in a single color, or with the background removed? Just tell me.`,
+      unsupportedFormat:(n,e)=>`Thanks — I received "${n}". This browser demo can't preview ${e} directly, so in production this would be converted server-side first. I've dropped in a placeholder so you can keep testing the layout — try "center it" or "make it bigger".`,
+      biggerDone:"Done — made it bigger.", smallerDone:"Sized it down a bit.",
+      scaleSet:p=>`Set the logo scale to ${p}%.`,
+      movedTopLeft:"Moved it to the top left.", movedTopRight:"Moved it to the top right.",
+      movedBottomLeft:"Moved it to the bottom left.", movedBottomRight:"Moved it to the bottom right.",
+      centered:"Centered it.", movedTop:"Moved it toward the top.", movedBottom:"Moved it toward the bottom.",
+      movedLeft:"Moved it to the left.", movedRight:"Moved it to the right.",
+      bgRemoved:"Removed the background — the light-colored surrounding area is now transparent.",
+      bgKept:"Kept the original background.",
+      grayscaleDone:"Converted to grayscale.",
+      monoDone:c=>`Converted to a single-color version (${c}) — cheaper for spot-color printing.`,
+      fullColorDone:"Restored full color.",
+      inkColorSet:n=>`Set the ink color to ${n}.`,
+      resetDone:"Reset the logo to its default size, position, and color.",
+      needLogo:"I don't have your logo yet — upload an image on the left and I'll apply that once it's in.",
+      needLogoForGenerate:"Upload a logo first so I have something to work with.",
+      pipelineRunning:"Running this through the pipeline — normalizing, vectorizing, and prepping for print...",
+      pipelineDone:"Print-ready file generated ✅ — check the mockup, add your contact details, then request your quote.",
+      needContact:"Almost there — add at least your phone or email on the right so we can send your quote.",
+      orderSubmitted:"Quote request ready — thanks! In the live system this would be sent to order@sofel-mr.eu for review.",
+      moqInfo:"Custom-printed bags require a minimum order of 30,000 pcs per design at full flexo quality. Smaller quantities are typically handled with digital printing instead.",
+      qtyFromChat:q=>`Updated the quantity to ${q} pcs.`,
+      fallback:"I can adjust size (\"bigger\"/\"smaller\"), position (\"center\", \"top left\"...), background (\"remove background\"), color (\"single color\", \"make it gold\"), or quantity (\"50000 pcs\"). Try a suggestion below, or say \"looks good\" when ready.",
+      intro:"Hi! I'll help you get your logo ready to print on SOFEL MR paper bags. Configure your bag on the left, then upload your logo — a photo is fine, it doesn't need to be a design file.",
+      successDetail:(handle,paper,size,qty,method,pos,mode)=>`${size} bag · ${handle} · ${paper} · ${qty} pcs · ${method} · logo ${pos} · ${mode}.`,
+    },
+  },
+  bg:{
+    brandName:"СОФЕЛ МР", appName:"AI Студио за поставяне на лого",
+    subtitle:"Конфигурирайте хартиените торби, качете логото си и заявете оферта — на база реалните производствени спецификации на СОФЕЛ МР.",
+    badge:"● Концептуално демо — не е официален инструмент на СОФЕЛ МР. Работи изцяло във вашия браузър.",
+    trustPills:["ISO 9001:2015","FSC сертификат","Основана през 2006","1.7 млн. торби / ден","Износ за 8 държави от ЕС"],
+    step1:"Конфигурирайте торбите", step2:"Качете вашето лого", step3:"Заявете оферта",
+    handleLabel:"Тип дръжки", paperLabel:"Хартия", sizeLabel:"Размер", qtyLabel:"Количество (бр.)",
+    handles:{internal:"Вътрешни дръжки", external:"Външни дръжки"},
+    papers:{white:"Бяла крафт хартия", kraft:"Кафява крафт хартия"},
+    sizeNames:{small:"Малка", medium:"Средна", large:"Голяма"},
+    printMethods:{digital:"Дигитален печат (малки серии)", flexo:"Флексо печат — до 6 цвята"},
+    moqBelow:"При количество под 30 000 бр. на дизайн, торбите обикновено се произвеждат с дигитален печат за малки серии.",
+    moqAbove:"Това количество позволява високоскоростен флексо печат — до 6 цвята.",
+    dropTitle:"Пуснете изображение тук или кликнете, за да изберете", dropHint:"JPG · PNG · WEBP · GIF · SVG · HEIC · PDF",
+    chatHeader:"💬 Асистент за дизайн", chatPlaceholder:"напр. направи го по-голямо и го центрирай, или премахни фона...",
+    sendBtn:"Изпрати", previewHeader:"🖼 Мостра на живо", dragHint:"плъзнете логото, за да го преместите",
+    generateBtn:"Генерирай файл за печат", submitBtn:"Заяви оферта",
+    contactLabel:"Вашите данни",
+    note:"Само демо — никакви данни не напускат браузъра ви и заявката не се изпраща реално. В реалната система тя би отишла до order@sofel-mr.eu.",
+    successTitle:"Заявката за оферта е готова",
+    specLabels:{handle:"Тип дръжки", paper:"Хартия", size:"Размер", qty:"Количество", method:"Метод на печат", logoFile:"Файл с лого", placement:"Позиция", scale:"Размер на лого", colorMode:"Цветови режим", background:"Фон", status:"Статус"},
+    colorModeLabels:{full:"Пълноцветно", grayscale:"Черно-бяло", mono:"Един цвят"},
+    bgLabels:{removed:"Премахнат", asUploaded:"Както е качен", dash:"—"},
+    statusLabels:{ready:"Готово за печат ✓", draft:"Чернова"},
+    stages:["Качване","AI обработка","Нормализация","Векторизация","Подготовка за печат","Мостра","Проверка от човек","Предаване"],
+    suggestions:["Направи го по-голямо","Направи го по-малко","Центрирай го","Премахни фона","Един цвят","Направи го златно","Изглежда добре, генерирай"],
+    pos:{left:"ляво", right:"дясно", top:"горе", bottom:"долу", centered:"Центрирано"},
+    colorNames:{black:"черно", white:"бяло", gold:"златно", red:"червено", blue:"синьо", green:"зелено", navy:"тъмносиньо"},
+    processSteps:[["Запитване","Клиентът изпраща запитване по имейл или телефон."],["Изготвяне на оферта","Уточняваме детайлите и изготвяме оферта бързо."],["Поръчка","След приемане се издава проформа фактура с 50% аванс."],["Производство и доставка","Торбите се произвеждат и доставят в договорения срок."]],
+    footerCoTitle:"СОФЕЛ МР ООД", footerAboutTitle:"За компанията",
+    footerAbout:"Производител на хартиени торби и опаковки от 2006 г., базиран в Асеновград, България. Капацитет 1.7 милиона бр. дневно, 8 производствени линии, екип от 36 души, износ за 8 европейски държави. Сертифицирана по ISO 9001:2015 и FSC.",
+    footerAddress:'Производствена база: гр. Асеновград, Северна индустриална зона, ул. „Строител“ 10, България',
+    footerEmails:"Запитвания: office@sofel-mr.eu · Поръчки: order@sofel-mr.eu",
+    footerHours:"Пон–Пет 8:00–17:00",
+    footerDisclaimer:"Това е независимо концептуално демо, изработено да илюстрира възможен AI инструмент за самообслужване, използвайки публично публикуваните производствени спецификации и процес на поръчка на СОФЕЛ МР. Не е официален продукт на СОФЕЛ МР.",
+    msgs:{
+      handleSet:n=>`Зададен тип дръжки: ${n}.`,
+      paperSet:n=>`Зададена хартия: ${n}.`,
+      sizeSet:l=>`Размерът на торбата е зададен на ${l}.`,
+      qtySet:(q,method)=>`Количеството е зададено на ${q} бр. — това означава ${method.toLowerCase()}.`,
+      gotLogo:n=>`Готово — виждам „${n}“. Искате ли да е центрирано, по-голямо, в един цвят, или с премахнат фон? Просто ми кажете.`,
+      unsupportedFormat:(n,e)=>`Благодаря — получих „${n}“. Това демо в браузъра не може да визуализира директно ${e} файлове, така че в реалната система това би било конвертирано на сървъра. Добавих временен placeholder, за да можете да тествате оформлението — опитайте „центрирай го“ или „направи го по-голямо“.`,
+      biggerDone:"Готово — направих го по-голямо.", smallerDone:"Намалих малко размера.",
+      scaleSet:p=>`Размерът на логото е зададен на ${p}%.`,
+      movedTopLeft:"Преместих го горе вляво.", movedTopRight:"Преместих го горе вдясно.",
+      movedBottomLeft:"Преместих го долу вляво.", movedBottomRight:"Преместих го долу вдясно.",
+      centered:"Центрирах го.", movedTop:"Преместих го нагоре.", movedBottom:"Преместих го надолу.",
+      movedLeft:"Преместих го вляво.", movedRight:"Преместих го вдясно.",
+      bgRemoved:"Премахнах фона — светлата област около логото вече е прозрачна.",
+      bgKept:"Запазих оригиналния фон.",
+      grayscaleDone:"Преобразувах в черно-бяло.",
+      monoDone:c=>`Преобразувах в едноцветна версия (${c}) — по-евтино за печат с плашки цвят.`,
+      fullColorDone:"Възстанових пълния цвят.",
+      inkColorSet:n=>`Зададох цвета на мастилото на ${n}.`,
+      resetDone:"Върнах логото към размера, позицията и цвета по подразбиране.",
+      needLogo:"Все още нямам вашето лого — качете изображение отляво и ще го приложа веднага щом пристигне.",
+      needLogoForGenerate:"Първо качете лого, за да имам с какво да работя.",
+      pipelineRunning:"Пускам това през процеса — нормализация, векторизация и подготовка за печат...",
+      pipelineDone:"Файлът за печат е готов ✅ — прегледайте мострата, добавете данните си и заявете оферта.",
+      needContact:"Почти готово — добавете поне телефон или имейл отдясно, за да можем да изпратим офертата.",
+      orderSubmitted:"Заявката за оферта е готова — благодаря! В реалната система тя би била изпратена до order@sofel-mr.eu за преглед.",
+      moqInfo:"Персонализирано отпечатаните торби изискват минимална поръчка от 30 000 бр. на дизайн при пълно флексо качество. По-малки количества обикновено се обработват с дигитален печат.",
+      qtyFromChat:q=>`Обнових количеството на ${q} бр.`,
+      fallback:"Мога да променям размера („по-голямо“/„по-малко“), позицията („центрирай“, „горе вляво“...), фона („премахни фона“), цвета („един цвят“, „направи го златно“) или количеството („50000 бр.“). Опитайте предложение по-долу или кажете „изглежда добре“, когато сте готови.",
+      intro:"Здравейте! Ще ви помогна да подготвите логото за печат върху хартиени торби на СОФЕЛ МР. Конфигурирайте торбата отляво, след което качете логото си — снимка е напълно достатъчна.",
+      successDetail:(handle,paper,size,qty,method,pos,mode)=>`${size} торба · ${handle} · ${paper} · ${qty} бр. · ${method} · лого ${pos} · ${mode}.`,
+    },
+  },
+};
+let currentLang = 'en';
+function T(){ return I18N[currentLang]; }
+
+/* ============== STATE ============== */
+const state = {
+  handleType:'external', paper:'kraft', sizeId:'medium', quantity:5000,
+  logoCanvas:null, logoBaseCanvas:null, fileName:null,
+  scale:0.45, posX:0.5, posY:0.5,
+  colorMode:'full', monoColor:'#1c1c1e', bgRemoved:false,
+  generated:false, dragging:false, lastOrder:null,
+};
+
+const PAPERS = [
+  {id:'white', fill:'#f4f1e8', fold:'#e0d9c6', flap:'#ece6d8', outline:'#c9bfa4'},
+  {id:'kraft', fill:'#b98a52', fold:'#9c7442', flap:'#a67a48', outline:'#7a5a34'},
+];
+const SIZES = [
+  {id:'small', w:200, bottom:80, h:360, hFrac:0.56},
+  {id:'medium', w:320, bottom:150, h:550, hFrac:0.74},
+  {id:'large', w:460, bottom:230, h:770, hFrac:0.92},
+];
+const MOQ_THRESHOLD = 30000;
+const COLOR_HEX = {black:'#1c1c1e', white:'#f5f3ee', gold:'#c08f3e', red:'#c1503f', blue:'#3f6fd6', green:'#3f7a52', navy:'#1b2f57'};
+
+function printingMethod(qty){ return qty>=MOQ_THRESHOLD ? 'flexo' : 'digital'; }
+
+/* ============== LANGUAGE SWITCH ============== */
+document.getElementById('langEnBtn').addEventListener('click', ()=>setLang('en'));
+document.getElementById('langBgBtn').addEventListener('click', ()=>setLang('bg'));
+function setLang(lang){
+  currentLang = lang;
+  document.getElementById('htmlRoot').lang = lang;
+  document.getElementById('langEnBtn').classList.toggle('active', lang==='en');
+  document.getElementById('langBgBtn').classList.toggle('active', lang==='bg');
+  applyStaticText();
+  renderTrustPills();
+  refreshHandleChips(true); refreshPaperChips(true); refreshSizeBtns(true);
+  updateMethodBadge();
+  relabelStepper();
+  renderChips();
+  updateSpec();
+  renderSuccess();
+  renderProcessStrip();
+}
+function applyStaticText(){
+  const t = T();
+  document.getElementById('txtBrandName').textContent = t.brandName;
+  document.getElementById('txtAppName').textContent = t.appName;
+  document.getElementById('txtSubtitle').textContent = t.subtitle;
+  document.getElementById('txtBadge').textContent = t.badge;
+  document.getElementById('txtStep1').textContent = t.step1;
+  document.getElementById('txtStep2').textContent = t.step2;
+  document.getElementById('txtStep3').textContent = t.step3;
+  document.getElementById('txtHandleLabel').textContent = t.handleLabel;
+  document.getElementById('txtPaperLabel').textContent = t.paperLabel;
+  document.getElementById('txtSizeLabel').textContent = t.sizeLabel;
+  document.getElementById('txtQtyLabel').textContent = t.qtyLabel;
+  document.getElementById('txtDropTitle').textContent = t.dropTitle;
+  document.getElementById('txtDropHint').textContent = t.dropHint;
+  document.getElementById('txtChatHeader').textContent = t.chatHeader;
+  document.getElementById('chatInput').placeholder = t.chatPlaceholder;
+  document.getElementById('sendBtn').textContent = t.sendBtn;
+  document.getElementById('txtPreviewHeader').textContent = t.previewHeader;
+  document.getElementById('txtDragHint').textContent = t.dragHint;
+  document.getElementById('generateBtn').textContent = t.generateBtn;
+  document.getElementById('submitBtn').textContent = t.submitBtn;
+  document.getElementById('txtContactLabel').textContent = t.contactLabel;
+  document.getElementById('cName').placeholder = (currentLang==='bg'?'Име':'Name');
+  document.getElementById('cLast').placeholder = (currentLang==='bg'?'Фамилия':'Last name');
+  document.getElementById('cPhone').placeholder = (currentLang==='bg'?'Телефон *':'Phone *');
+  document.getElementById('cEmail').placeholder = (currentLang==='bg'?'Имейл *':'E-mail *');
+  document.getElementById('cMsg').placeholder = (currentLang==='bg'?'Съобщение (незадължително)':'Message (optional)');
+  document.getElementById('txtNote').textContent = t.note;
+  document.getElementById('txtSuccessTitle').textContent = t.successTitle;
+  document.getElementById('txtFooterCoTitle').textContent = t.footerCoTitle;
+  document.getElementById('txtFooterAboutTitle').textContent = t.footerAboutTitle;
+  document.getElementById('footerAddress').textContent = t.footerAddress;
+  document.getElementById('footerEmails').textContent = t.footerEmails;
+  document.getElementById('footerHours').textContent = t.footerHours;
+  document.getElementById('footerAbout').textContent = t.footerAbout;
+  document.getElementById('footerDisclaimer').textContent = t.footerDisclaimer;
+}
+function renderTrustPills(){
+  document.getElementById('trustRow').innerHTML = T().trustPills.map(p=>`<div class="trust-pill">${p}</div>`).join('');
+}
+function renderProcessStrip(){
+  document.getElementById('processStrip').innerHTML = T().processSteps.map((s,i)=>
+    `<div class="proc-step"><div class="n">${i+1}</div><div class="t">${s[0]}</div><div>${s[1]}</div></div>`).join('');
+}
+
+/* ============== CONFIG UI ============== */
+const handleOpts = document.getElementById('handleOpts');
+['internal','external'].forEach(id=>{
+  const el = document.createElement('div');
+  el.className='opt-chip'+(id===state.handleType?' active':'');
+  el.dataset.id=id;
+  el.innerHTML = `<span class="lbl">${T().handles[id]}</span>`;
+  el.addEventListener('click',()=>{ state.handleType=id; refreshHandleChips(); render(); botSay(T().msgs.handleSet(T().handles[id])); });
+  handleOpts.appendChild(el);
+});
+function refreshHandleChips(labelsOnly){
+  document.querySelectorAll('#handleOpts .opt-chip').forEach(el=>{
+    if(!labelsOnly) el.classList.toggle('active', el.dataset.id===state.handleType);
+    el.querySelector('.lbl').textContent = T().handles[el.dataset.id];
+  });
+}
+
+const paperOpts = document.getElementById('paperOpts');
+PAPERS.forEach(p=>{
+  const el = document.createElement('div');
+  el.className='opt-chip'+(p.id===state.paper?' active':'');
+  el.dataset.id=p.id;
+  el.innerHTML = `<div class="sw" style="background:${p.fill}"></div><span class="lbl">${T().papers[p.id]}</span>`;
+  el.addEventListener('click',()=>{ state.paper=p.id; refreshPaperChips(); render(); botSay(T().msgs.paperSet(T().papers[p.id])); });
+  paperOpts.appendChild(el);
+});
+function refreshPaperChips(labelsOnly){
+  document.querySelectorAll('#paperOpts .opt-chip').forEach(el=>{
+    if(!labelsOnly) el.classList.toggle('active', el.dataset.id===state.paper);
+    el.querySelector('.lbl').textContent = T().papers[el.dataset.id];
+  });
+}
+
+const sizeOpts = document.getElementById('sizeOpts');
+SIZES.forEach(s=>{
+  const el=document.createElement('div');
+  el.className='size-btn'+(s.id===state.sizeId?' active':'');
+  el.dataset.id=s.id;
+  el.innerHTML = `<b class="lbl">${T().sizeNames[s.id]}</b><span>${s.w}×${s.h} mm</span>`;
+  el.addEventListener('click',()=>{ state.sizeId=s.id; refreshSizeBtns(); render(); botSay(T().msgs.sizeSet(T().sizeNames[s.id])); });
+  sizeOpts.appendChild(el);
+});
+function refreshSizeBtns(labelsOnly){
+  document.querySelectorAll('.size-btn').forEach(el=>{
+    if(!labelsOnly) el.classList.toggle('active', el.dataset.id===state.sizeId);
+    el.querySelector('.lbl').textContent = T().sizeNames[el.dataset.id];
+  });
+}
+
+const qtyInput = document.getElementById('qtyInput');
+qtyInput.addEventListener('change', ()=>{
+  const prevMethod = printingMethod(state.quantity);
+  state.quantity = Math.max(100, parseInt(qtyInput.value)||100);
+  qtyInput.value = state.quantity;
+  const newMethod = printingMethod(state.quantity);
+  updateMethodBadge();
+  updateSpec();
+  if(newMethod!==prevMethod || true) botSay(T().msgs.qtySet(state.quantity.toLocaleString(), T().printMethods[newMethod]));
+});
+function updateMethodBadge(){
+  const method = printingMethod(state.quantity);
+  document.getElementById('methodBadge').textContent = T().printMethods[method];
+  document.getElementById('moqNote').textContent = method==='digital' ? T().moqBelow : T().moqAbove;
+}
+updateMethodBadge();
+
+/* ============== BAG DRAWING ============== */
+const canvas = document.getElementById('bagCanvas');
+const ctx = canvas.getContext('2d');
+let printArea = {x:0,y:0,w:0,h:0};
+
+function drawBag(){
+  const W=canvas.width, H=canvas.height;
+  ctx.clearRect(0,0,W,H);
+  const g = ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,'#f7f2e7'); g.addColorStop(1,'#eee4d0');
+  ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+
+  const p = PAPERS.find(x=>x.id===state.paper);
+  const sz = SIZES.find(s=>s.id===state.sizeId);
+  const bagH = H*sz.hFrac;
+  const bagW = bagH*0.72;
+  const bx = (W-bagW)/2;
+  const by = H-bagH-46;
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.ellipse(W/2, by+bagH+8, bagW*0.42, 10, 0, 0, Math.PI*2);
+  ctx.fillStyle='rgba(60,45,25,0.22)';
+  ctx.fill();
+  ctx.restore();
+
+  // external handles: rope loops behind the bag, drawn first so body overlaps the base
+  if(state.handleType==='external'){
+    ctx.strokeStyle = p.id==='kraft' ? '#6b4b28' : '#a89b7d';
+    ctx.lineWidth = 4;
+    [bx+bagW*0.28, bx+bagW*0.72].forEach(hx=>{
+      ctx.beginPath();
+      ctx.moveTo(hx-3, by+bagH*0.08);
+      ctx.quadraticCurveTo(hx, by-bagH*0.16, hx+3, by+bagH*0.08);
+      ctx.stroke();
+    });
+  }
+
+  ctx.fillStyle=p.fill;
+  ctx.strokeStyle=p.outline;
+  ctx.lineWidth=1.5;
+  roundRectPath(bx,by+bagH*0.12,bagW,bagH*0.88,6);
+  ctx.fill(); ctx.stroke();
+
+  ctx.strokeStyle=p.fold; ctx.lineWidth=1.2;
+  [0.16,0.5,0.84].forEach(fx=>{
+    ctx.beginPath(); ctx.moveTo(bx+bagW*fx, by+bagH*0.12); ctx.lineTo(bx+bagW*fx, by+bagH); ctx.stroke();
+  });
+
+  // subtle paper grain
+  ctx.strokeStyle = p.id==='kraft' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)';
+  ctx.lineWidth = 1;
+  for(let i=0;i<26;i++){
+    const gx = bx + Math.random()*bagW;
+    const gy = by+bagH*0.14 + Math.random()*bagH*0.84;
+    ctx.beginPath(); ctx.moveTo(gx,gy); ctx.lineTo(gx+8+Math.random()*10, gy+2); ctx.stroke();
+  }
+
+  ctx.fillStyle=p.flap;
+  roundRectPath(bx-2, by+bagH*0.06, bagW+4, bagH*0.13, 4);
+  ctx.fill();
+  ctx.strokeStyle=p.outline; ctx.lineWidth=1; ctx.stroke();
+
+  if(state.handleType==='internal'){
+    ctx.fillStyle='rgba(0,0,0,0.22)';
+    [bx+bagW*0.28, bx+bagW*0.72].forEach(hx=>{
+      ctx.beginPath();
+      ctx.ellipse(hx, by+bagH*0.19, bagW*0.085, bagH*0.022, 0, 0, Math.PI*2);
+      ctx.fill();
+    });
+  } else {
+    ctx.fillStyle = p.id==='kraft' ? '#8a6238' : '#cabf9e';
+    [bx+bagW*0.28, bx+bagW*0.72].forEach(hx=>{
+      ctx.beginPath(); ctx.ellipse(hx, by+bagH*0.07, 6, 4, 0, 0, Math.PI*2); ctx.fill();
+    });
+  }
+
+  printArea = { x: bx+bagW*0.18, y: by+bagH*0.32, w: bagW*0.64, h: bagH*0.5 };
+
+  if(!state.logoCanvas){
+    ctx.save();
+    ctx.setLineDash([4,4]);
+    ctx.strokeStyle='rgba(60,45,20,0.28)';
+    ctx.strokeRect(printArea.x, printArea.y, printArea.w, printArea.h);
+    ctx.restore();
+  }
+
+  if(state.logoCanvas){
+    const lw = printArea.w * state.scale;
+    const lh = lw * (state.logoCanvas.height/state.logoCanvas.width);
+    const cx = printArea.x + printArea.w*state.posX;
+    const cy = printArea.y + printArea.h*state.posY;
+    ctx.save();
+    ctx.shadowColor='rgba(0,0,0,0.28)';
+    ctx.shadowBlur=6;
+    ctx.drawImage(state.logoCanvas, cx-lw/2, cy-lh/2, lw, lh);
+    ctx.restore();
+  }
+}
+function roundRectPath(x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath();
+}
+function render(){ drawBag(); updateSpec(); }
+render();
+
+canvas.addEventListener('mousedown', ()=>{ if(state.logoCanvas) state.dragging = true; });
+window.addEventListener('mouseup', ()=> state.dragging=false);
+canvas.addEventListener('mousemove', e=>{
+  if(!state.dragging || !state.logoCanvas) return;
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width/rect.width, scaleY = canvas.height/rect.height;
+  const mx = (e.clientX-rect.left)*scaleX, my = (e.clientY-rect.top)*scaleY;
+  state.posX = Math.min(1,Math.max(0,(mx-printArea.x)/printArea.w));
+  state.posY = Math.min(1,Math.max(0,(my-printArea.y)/printArea.h));
+  render();
+});
+
+/* ============== FILE UPLOAD ============== */
+const dropzone = document.getElementById('dropzone');
+const fileInput = document.getElementById('fileInput');
+const filePill = document.getElementById('filePill');
+dropzone.addEventListener('click', ()=> fileInput.click());
+dropzone.addEventListener('dragover', e=>{ e.preventDefault(); dropzone.classList.add('drag'); });
+dropzone.addEventListener('dragleave', ()=> dropzone.classList.remove('drag'));
+dropzone.addEventListener('drop', e=>{
+  e.preventDefault(); dropzone.classList.remove('drag');
+  if(e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+});
+fileInput.addEventListener('change', e=>{ if(e.target.files.length) handleFile(e.target.files[0]); });
+
+function handleFile(file){
+  state.fileName = file.name;
+  const ext = file.name.split('.').pop().toLowerCase();
+  filePill.innerHTML = `<div class="file-pill">📎 ${file.name} <span style="color:var(--text-dim2)">(${(file.size/1024).toFixed(0)} KB)</span></div>`;
+  const supported = ['png','jpg','jpeg','webp','gif','svg'];
+  if(supported.includes(ext)){
+    const reader = new FileReader();
+    reader.onload = ev=>{
+      const img = new Image();
+      img.onload = ()=>{
+        const base = document.createElement('canvas');
+        const maxDim = 480;
+        const ratio = Math.min(1, maxDim/Math.max(img.width,img.height));
+        base.width = img.width*ratio; base.height = img.height*ratio;
+        base.getContext('2d').drawImage(img,0,0,base.width,base.height);
+        state.logoBaseCanvas = base;
+        state.colorMode='full'; state.bgRemoved=false;
+        applyProcessing();
+        botSay(T().msgs.gotLogo(file.name));
+        resetStepper();
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  } else {
+    buildPlaceholderLogo(file.name);
+    applyProcessing();
+    botSay(T().msgs.unsupportedFormat(file.name, ext.toUpperCase()));
+    resetStepper();
+  }
+}
+function buildPlaceholderLogo(name){
+  const base = document.createElement('canvas');
+  base.width=300; base.height=300;
+  const bctx = base.getContext('2d');
+  bctx.fillStyle='#eef2f8'; bctx.beginPath(); bctx.arc(150,150,140,0,Math.PI*2); bctx.fill();
+  bctx.fillStyle='#875a30';
+  const initials = (name.split('.')[0].match(/[A-Za-z]/g)||['L','G']).slice(0,2).join('').toUpperCase();
+  bctx.font='bold 110px -apple-system, sans-serif';
+  bctx.textAlign='center'; bctx.textBaseline='middle';
+  bctx.fillText(initials, 150, 160);
+  state.logoBaseCanvas = base;
+  state.colorMode='full'; state.bgRemoved=false;
+}
+
+/* ============== IMAGE PROCESSING ============== */
+function applyProcessing(){
+  if(!state.logoBaseCanvas) return;
+  const src = state.logoBaseCanvas;
+  const out = document.createElement('canvas');
+  out.width = src.width; out.height = src.height;
+  const octx = out.getContext('2d');
+  octx.drawImage(src,0,0);
+  let imgData = octx.getImageData(0,0,out.width,out.height);
+  if(state.bgRemoved) imgData = floodFillRemoveWhite(imgData, out.width, out.height);
+  if(state.colorMode==='grayscale') imgData = toGrayscale(imgData);
+  if(state.colorMode==='mono') imgData = toMono(imgData, state.monoColor);
+  octx.putImageData(imgData,0,0);
+  state.logoCanvas = out;
+  render();
+}
+function floodFillRemoveWhite(imgData, w, h){
+  const d = imgData.data;
+  const visited = new Uint8Array(w*h);
+  const stack = [];
+  const isBgish = (i)=> d[i]>232 && d[i+1]>232 && d[i+2]>232;
+  for(let x=0;x<w;x++){ stack.push([x,0]); stack.push([x,h-1]); }
+  for(let y=0;y<h;y++){ stack.push([0,y]); stack.push([w-1,y]); }
+  while(stack.length){
+    const [x,y] = stack.pop();
+    if(x<0||y<0||x>=w||y>=h) continue;
+    const idx = y*w+x;
+    if(visited[idx]) continue;
+    visited[idx]=1;
+    const i = idx*4;
+    if(!isBgish(i)) continue;
+    d[i+3]=0;
+    stack.push([x+1,y],[x-1,y],[x,y+1],[x,y-1]);
+  }
+  return imgData;
+}
+function toGrayscale(imgData){
+  const d = imgData.data;
+  for(let i=0;i<d.length;i+=4){
+    const l = 0.299*d[i]+0.587*d[i+1]+0.114*d[i+2];
+    d[i]=d[i+1]=d[i+2]=l;
+  }
+  return imgData;
+}
+function toMono(imgData, hex){
+  const rgb = hexToRgb(hex);
+  const d = imgData.data;
+  for(let i=0;i<d.length;i+=4){
+    if(d[i+3]<10) continue;
+    const l = 0.299*d[i]+0.587*d[i+1]+0.114*d[i+2];
+    if(l<160){ d[i]=rgb.r; d[i+1]=rgb.g; d[i+2]=rgb.b; d[i+3]=255; }
+    else { d[i+3]=0; }
+  }
+  return imgData;
+}
+function hexToRgb(hex){
+  const v = parseInt(hex.replace('#',''),16);
+  return {r:(v>>16)&255, g:(v>>8)&255, b:v&255};
+}
+
+/* ============== SPEC PANEL ============== */
+function updateSpec(){
+  const t = T();
+  const p = PAPERS.find(x=>x.id===state.paper);
+  const sz = SIZES.find(s=>s.id===state.sizeId);
+  const method = printingMethod(state.quantity);
+  const rows = [
+    [t.specLabels.handle, t.handles[state.handleType]],
+    [t.specLabels.paper, t.papers[p.id]],
+    [t.specLabels.size, `${t.sizeNames[sz.id]} · ${sz.w}×${sz.h} mm`],
+    [t.specLabels.qty, state.quantity.toLocaleString()+' pcs'],
+    [t.specLabels.method, t.printMethods[method]],
+    [t.specLabels.logoFile, state.fileName || t.bgLabels.dash],
+    [t.specLabels.placement, state.logoCanvas ? describePosition(state.posX,state.posY) : t.bgLabels.dash],
+    [t.specLabels.scale, state.logoCanvas ? Math.round(state.scale/0.45*100)+'%' : t.bgLabels.dash],
+    [t.specLabels.colorMode, t.colorModeLabels[state.colorMode]],
+    [t.specLabels.background, state.bgRemoved ? t.bgLabels.removed : (state.logoCanvas ? t.bgLabels.asUploaded : t.bgLabels.dash)],
+    [t.specLabels.status, state.generated ? t.statusLabels.ready : t.statusLabels.draft],
+  ];
+  document.getElementById('specList').innerHTML = rows.map(([k,v])=>`<div class="spec-row"><span class="k">${k}</span><span class="v">${v}</span></div>`).join('');
+  checkSubmitEnabled();
+}
+function describePosition(x,y){
+  const t = T().pos;
+  const h = x<0.33?t.left:x>0.66?t.right:null;
+  const v = y<0.33?t.top:y>0.66?t.bottom:null;
+  if(!h && !v) return t.centered;
+  return [v,h].filter(Boolean).join(' ');
+}
+
+/* ============== CHAT ============== */
+const chatLog = document.getElementById('chatLog');
+const chatInput = document.getElementById('chatInput');
+const chipsRow = document.getElementById('chipsRow');
+
+function addMsg(text, who){
+  const row = document.createElement('div');
+  row.className = 'msg '+who;
+  const avLabel = who==='bot' ? 'AI' : (currentLang==='bg'?'Вие':'You');
+  row.innerHTML = `<div class="av">${avLabel}</div><div class="bubble"></div>`;
+  row.querySelector('.bubble').textContent = text;
+  chatLog.appendChild(row);
+  chatLog.scrollTop = chatLog.scrollHeight;
+}
+function botSay(text){ setTimeout(()=>addMsg(text,'bot'), 280); }
+function userSay(text){ addMsg(text,'user'); }
+
+function renderChips(){
+  chipsRow.innerHTML='';
+  T().suggestions.forEach(s=>{
+    const el=document.createElement('div');
+    el.className='sugg-chip'; el.textContent=s;
+    el.addEventListener('click',()=> handleUserInput(s));
+    chipsRow.appendChild(el);
+  });
+}
+renderChips();
+
+document.getElementById('sendBtn').addEventListener('click', sendChat);
+chatInput.addEventListener('keydown', e=>{ if(e.key==='Enter') sendChat(); });
+function sendChat(){
+  const v = chatInput.value.trim();
+  if(!v) return;
+  handleUserInput(v);
+  chatInput.value='';
+}
+
+const KW = {
+  bigger:['bigger','larger','increase','zoom in','по-голям','по-голямо','увеличи','уголеми'],
+  smaller:['smaller','shrink','decrease','zoom out','по-малък','по-малко','намали','смали'],
+  topLeft:['top left','горе вляво','горе ляво'],
+  topRight:['top right','горе вдясно','горе дясно'],
+  bottomLeft:['bottom left','долу вляво','долу ляво'],
+  bottomRight:['bottom right','долу вдясно','долу дясно'],
+  center:['center','middle','центрирай','в центъра','средата','центъра'],
+  top:['top','горе','нагоре'],
+  bottom:['bottom','долу','надолу'],
+  left:['left','ляво','вляво'],
+  right:['right','дясно','вдясно'],
+  removeBg:['remove background','remove the background','transparent background','no background','remove the white','премахни фона','прозрачен фон','без фон'],
+  keepBg:['keep the background','keep background','add background','undo background','запази фона','добави фон'],
+  grayscale:['grayscale','black and white','black & white','черно-бяло','сиво'],
+  mono:['single color','one color','one-color','mono','spot color','един цвят','едноцветно','монохром'],
+  full:['full color','restore color','original color','пълноцветно','оригинален цвят'],
+  reset:['reset','start over','нулирай','отначало'],
+  go:['looks good','generate','submit','finalize','ready','proceed','изглежда добре','генерирай','изпрати','готово','продължи'],
+  colorTrigger:['color','colour','make it','ink','tint','цвят','цвета','мастило','боя','направи','оцвети'],
+  moq:['minimum order','moq','minimum quantity','минимално количество','минимална поръчка'],
+};
+function matchAny(t, arr){ return arr.some(p=>t.includes(p)); }
+
+function handleUserInput(text){
+  userSay(text);
+  const t = text.toLowerCase();
+  const m = T().msgs;
+  let responded = false;
+
+  if(matchAny(t,KW.moq)){ botSay(m.moqInfo); responded=true; }
+
+  const qtyMatch = t.match(/(\d{1,3}[\s,.]?\d{3,6})\s*(pcs|pieces|bags|units|бр\.?|бройки|броя|торби)/i) || t.match(/\b(\d{1,3})\s*[kк]\b/i);
+  if(qtyMatch){
+    let q = qtyMatch[0].toLowerCase().includes('k') || qtyMatch[0].toLowerCase().includes('к')
+      ? parseInt(qtyMatch[1])*1000
+      : parseInt(qtyMatch[1].replace(/[\s,.]/g,''));
+    if(q>=100){
+      state.quantity = q; qtyInput.value = q; updateMethodBadge(); updateSpec();
+      botSay(m.qtyFromChat(q.toLocaleString())); responded=true;
+    }
+  }
+
+  if(!state.logoCanvas){
+    if(!responded) botSay(m.needLogo);
+    return;
+  }
+
+  if(matchAny(t,KW.bigger)){ state.scale=Math.min(0.45*2, state.scale*1.2); render(); botSay(m.biggerDone); responded=true; }
+  if(matchAny(t,KW.smaller)){ state.scale=Math.max(0.45*0.35, state.scale*0.8); render(); botSay(m.smallerDone); responded=true; }
+  const pctMatch = t.match(/(\d{1,3})\s*%/);
+  if(pctMatch){ state.scale=0.45*(parseInt(pctMatch[1])/100); render(); botSay(m.scaleSet(pctMatch[1])); responded=true; }
+
+  if(matchAny(t,KW.topLeft)){ state.posX=0.15; state.posY=0.15; render(); botSay(m.movedTopLeft); responded=true; }
+  else if(matchAny(t,KW.topRight)){ state.posX=0.85; state.posY=0.15; render(); botSay(m.movedTopRight); responded=true; }
+  else if(matchAny(t,KW.bottomLeft)){ state.posX=0.15; state.posY=0.85; render(); botSay(m.movedBottomLeft); responded=true; }
+  else if(matchAny(t,KW.bottomRight)){ state.posX=0.85; state.posY=0.85; render(); botSay(m.movedBottomRight); responded=true; }
+  else if(matchAny(t,KW.center)){ state.posX=0.5; state.posY=0.5; render(); botSay(m.centered); responded=true; }
+  else if(matchAny(t,KW.top)){ state.posY=0.15; render(); botSay(m.movedTop); responded=true; }
+  else if(matchAny(t,KW.bottom)){ state.posY=0.85; render(); botSay(m.movedBottom); responded=true; }
+  else if(matchAny(t,KW.left)){ state.posX=0.15; render(); botSay(m.movedLeft); responded=true; }
+  else if(matchAny(t,KW.right)){ state.posX=0.85; render(); botSay(m.movedRight); responded=true; }
+
+  if(matchAny(t,KW.removeBg)){ state.bgRemoved=true; applyProcessing(); botSay(m.bgRemoved); responded=true; }
+  if(matchAny(t,KW.keepBg)){ state.bgRemoved=false; applyProcessing(); botSay(m.bgKept); responded=true; }
+
+  if(matchAny(t,KW.grayscale)){ state.colorMode='grayscale'; applyProcessing(); botSay(m.grayscaleDone); responded=true; }
+  else if(matchAny(t,KW.mono)){ state.colorMode='mono'; applyProcessing(); botSay(m.monoDone(state.monoColor)); responded=true; }
+  else if(matchAny(t,KW.full)){ state.colorMode='full'; applyProcessing(); botSay(m.fullColorDone); responded=true; }
+
+  if(matchAny(t,KW.colorTrigger)){
+    for(const key in COLOR_HEX){
+      const enWord = I18N.en.colorNames[key], bgWord = I18N.bg.colorNames[key];
+      if(t.includes(enWord) || t.includes(bgWord)){
+        state.monoColor = COLOR_HEX[key];
+        state.colorMode = 'mono';
+        applyProcessing();
+        botSay(m.inkColorSet(T().colorNames[key]));
+        responded = true;
+        break;
+      }
+    }
+  }
+
+  if(matchAny(t,KW.reset)){
+    state.scale=0.45; state.posX=0.5; state.posY=0.5; state.colorMode='full'; state.bgRemoved=false;
+    applyProcessing(); botSay(m.resetDone); responded=true;
+  }
+
+  if(matchAny(t,KW.go)){ runPipeline(); responded=true; }
+
+  if(!responded) botSay(m.fallback);
+}
+
+/* ============== STAGE STEPPER / GENERATE ============== */
+const stepperEl = document.getElementById('stepper');
+function resetStepper(){
+  stepperEl.innerHTML = T().stages.map((s,i)=>`<div class="stp" id="stp-${i}"><span class="num">${i+1}</span><span class="lbl">${s}</span></div>`).join('');
+}
+function relabelStepper(){
+  T().stages.forEach((s,i)=>{
+    const el = document.getElementById('stp-'+i);
+    if(el) el.querySelector('.lbl').textContent = s;
+  });
+}
+resetStepper();
+
+document.getElementById('generateBtn').addEventListener('click', ()=>{
+  if(!state.logoCanvas){ botSay(T().msgs.needLogoForGenerate); return; }
+  runPipeline();
+});
+
+let pipelineRunning = false;
+function runPipeline(){
+  if(!state.logoCanvas){ botSay(T().msgs.needLogoForGenerate); return; }
+  if(pipelineRunning) return;
+  pipelineRunning = true;
+  resetStepper();
+  botSay(T().msgs.pipelineRunning);
+  let i=0;
+  const stages = T().stages;
+  const timer = setInterval(()=>{
+    if(i>0){ const prev=document.getElementById('stp-'+(i-1)); if(prev) prev.classList.replace('active','done'); }
+    if(i>=stages.length){
+      clearInterval(timer);
+      pipelineRunning = false;
+      state.generated = true;
+      updateSpec();
+      botSay(T().msgs.pipelineDone);
+      return;
+    }
+    const el = document.getElementById('stp-'+i);
+    if(el) el.classList.add('active');
+    i++;
+  }, 420);
+}
+
+/* ============== CONTACT + SUBMIT ============== */
+const cPhone = document.getElementById('cPhone'), cEmail = document.getElementById('cEmail');
+[cPhone, cEmail, document.getElementById('cName'), document.getElementById('cLast')].forEach(el=>{
+  el.addEventListener('input', checkSubmitEnabled);
+});
+function checkSubmitEnabled(){
+  const ok = state.generated && (cPhone.value.trim().length>4 || cEmail.value.includes('@'));
+  document.getElementById('submitBtn').disabled = !ok;
+}
+
+document.getElementById('submitBtn').addEventListener('click', ()=>{
+  if(document.getElementById('submitBtn').disabled) return;
+  state.lastOrder = {
+    handleType:state.handleType, paper:state.paper, sizeId:state.sizeId, quantity:state.quantity,
+    posX:state.posX, posY:state.posY, colorMode:state.colorMode,
+  };
+  document.getElementById('successBanner').classList.add('show');
+  renderSuccess();
+  botSay(T().msgs.orderSubmitted);
+});
+function renderSuccess(){
+  if(!state.lastOrder) return;
+  const t = T();
+  const sz = SIZES.find(s=>s.id===state.lastOrder.sizeId);
+  const method = printingMethod(state.lastOrder.quantity);
+  const posLabel = describePosition(state.lastOrder.posX, state.lastOrder.posY).toLowerCase();
+  const modeLabel = t.colorModeLabels[state.lastOrder.colorMode].toLowerCase();
+  document.getElementById('successDetail').textContent = t.msgs.successDetail(
+    t.handles[state.lastOrder.handleType].toLowerCase(),
+    t.papers[state.lastOrder.paper].toLowerCase(),
+    `${t.sizeNames[sz.id]} (${sz.w}×${sz.h} mm)`,
+    state.lastOrder.quantity.toLocaleString(),
+    t.printMethods[method],
+    posLabel, modeLabel
+  );
+}
+
+/* ============== INIT ============== */
+applyStaticText();
+renderTrustPills();
+renderProcessStrip();
+botSay(T().msgs.intro);
+</script>
+</body>
+</html>
